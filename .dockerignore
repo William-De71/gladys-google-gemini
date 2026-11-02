@@ -1,0 +1,17 @@
+node_modules
+data
+test
+docs
+coverage
+.github
+.git
+*.md
+cover.jpg
+cover.svg
+scripts
+.prettierrc.json
+.prettierignore
+eslint.config.js
+.gitattributes
+.gitignore
+.dockerignore

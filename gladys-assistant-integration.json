@@ -1,0 +1,533 @@
+{
+  "manifest_version": 1,
+  "type": "ai",
+  "name": "Google Gemini",
+  "description": {
+    "en": "Run the Gladys assistant on Google Gemini with your own API key from Google AI Studio.",
+    "fr": "Faites tourner l’assistant Gladys sur Google Gemini avec votre clé d’API Google AI Studio.",
+    "de": "Betreibe den Gladys-Assistenten mit Google Gemini und deinem API-Schlüssel aus Google AI Studio.",
+    "es": "Haga funcionar el asistente de Gladys con Google Gemini y su clave de API de Google AI Studio."
+  },
+  "version": "0.1.0",
+  "docker_image": "ghcr.io/william-de71/gladys-google-gemini:0.1.0",
+  "gladys_version": ">=5.3.0",
+  "categories": ["assistants"],
+  "keywords": ["gemini", "google", "ai studio", "flash", "argon", "llm", "chatbot", "ia", "ki"],
+  "cover_image": "https://raw.githubusercontent.com/William-De71/gladys-google-gemini/main/cover.jpg",
+  "transports": ["cloud"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "en": "Gemini answers through the Gemini API of Google: create an API key in Google AI Studio (free tier, or paid with a billing account), paste it below, then select this integration in Settings, Artificial Intelligence. Gemini then sees every chat message, the history, the state of the devices it reads and the chat images.",
+        "fr": "Gemini répond via l’API Gemini de Google : créez une clé d’API dans Google AI Studio (offre gratuite, ou payante avec un compte de facturation), collez-la ci-dessous, puis choisissez cette intégration dans Paramètres, Intelligence artificielle. Gemini voit alors chaque message du chat, l’historique, l’état des appareils qu’il consulte et les images du chat.",
+        "de": "Gemini antwortet über die Gemini-API von Google: Erstelle einen API-Schlüssel in Google AI Studio (kostenloser Tarif oder bezahlt mit einem Abrechnungskonto), füge ihn unten ein und wähle dann diese Integration unter Einstellungen, Künstliche Intelligenz. Gemini sieht dann jede Chat-Nachricht, den Verlauf, den Zustand der Geräte, die es abfragt, und die Bilder des Chats.",
+        "es": "Gemini responde a través de la API de Gemini de Google: cree una clave de API en Google AI Studio (nivel gratuito, o de pago con una cuenta de facturación), péguela abajo y luego elija esta integración en Ajustes, Inteligencia artificial. Gemini ve entonces cada mensaje del chat, el historial, el estado de los dispositivos que consulta y las imágenes del chat."
+      },
+      "links": [
+        {
+          "url": "https://aistudio.google.com/apikey",
+          "label": {
+            "en": "Gemini API keys",
+            "fr": "Clés d’API Gemini",
+            "de": "Gemini-API-Schlüssel",
+            "es": "Claves de API de Gemini"
+          }
+        },
+        {
+          "url": "https://github.com/William-De71/gladys-google-gemini/blob/main/docs/en.md",
+          "label": {
+            "en": "Integration documentation",
+            "fr": "Documentation de l’intégration",
+            "de": "Dokumentation der Integration",
+            "es": "Documentación de la integración"
+          }
+        }
+      ]
+    },
+    {
+      "key": "privacy",
+      "type": "section",
+      "label": {
+        "en": "Free tier and privacy",
+        "fr": "Offre gratuite et confidentialité",
+        "de": "Kostenloser Tarif und Datenschutz",
+        "es": "Nivel gratuito y privacidad"
+      },
+      "description": {
+        "en": "Outside the European Economic Area, Switzerland and the United Kingdom, Google may use the requests of the free tier to improve its products, and people may read them. In those countries, and with a billing account anywhere, Google does not. The free tier has low per-minute and per-day limits, and Gemini 4 Argon needs billing.",
+        "fr": "Hors de l’Espace économique européen, de la Suisse et du Royaume-Uni, Google peut utiliser les requêtes de l’offre gratuite pour améliorer ses produits, et des personnes peuvent les lire. Dans ces pays, et partout avec un compte de facturation, ce n’est pas le cas. L’offre gratuite a des limites par minute et par jour basses, et Gemini 4 Argon exige la facturation.",
+        "de": "Außerhalb des Europäischen Wirtschaftsraums, der Schweiz und des Vereinigten Königreichs darf Google die Anfragen des kostenlosen Tarifs zur Verbesserung seiner Produkte nutzen, und Menschen können sie lesen. In diesen Ländern und überall mit einem Abrechnungskonto ist das nicht der Fall. Der kostenlose Tarif hat niedrige Limits pro Minute und pro Tag, und Gemini 4 Argon braucht eine Abrechnung.",
+        "es": "Fuera del Espacio Económico Europeo, Suiza y el Reino Unido, Google puede usar las solicitudes del nivel gratuito para mejorar sus productos, y algunas personas pueden leerlas. En esos países, y en cualquier lugar con una cuenta de facturación, no es así. El nivel gratuito tiene límites bajos por minuto y por día, y Gemini 4 Argon requiere facturación."
+      }
+    },
+    {
+      "key": "api_key",
+      "type": "secret",
+      "label": {
+        "en": "Gemini API key",
+        "fr": "Clé d’API Gemini",
+        "de": "Gemini-API-Schlüssel",
+        "es": "Clave de API de Gemini"
+      },
+      "description": {
+        "en": "Created in Google AI Studio, in Get API key. It stays in Gladys and is never shown again nor logged.",
+        "fr": "Créée dans Google AI Studio, dans Get API key. Elle reste dans Gladys, n’est plus jamais affichée ni journalisée.",
+        "de": "In Google AI Studio unter Get API key erstellt. Er bleibt in Gladys und wird nie wieder angezeigt oder protokolliert.",
+        "es": "Creada en Google AI Studio, en Get API key. Se queda en Gladys y nunca se vuelve a mostrar ni se registra."
+      },
+      "required": true
+    },
+    {
+      "key": "model",
+      "type": "select",
+      "label": {
+        "en": "Chat model",
+        "fr": "Modèle du chat",
+        "de": "Chat-Modell",
+        "es": "Modelo del chat"
+      },
+      "description": {
+        "en": "Answers the chat, creates the scenes and writes the weekly digest. 3.8 Flash is the best of the free tier; 4 Argon is the most capable but paid only; the Flash-Lite models are fast and cheap but less reliable to create scenes.",
+        "fr": "Répond au chat, crée les scènes et rédige le résumé hebdomadaire. 3.8 Flash est le meilleur de l’offre gratuite ; 4 Argon est le plus capable mais seulement payant ; les Flash-Lite sont rapides et peu chers mais moins fiables pour créer des scènes.",
+        "de": "Beantwortet den Chat, erstellt die Szenen und schreibt den Wochenrückblick. 3.8 Flash ist das beste Modell des kostenlosen Tarifs; 4 Argon ist am leistungsfähigsten, aber nur bezahlt; die Flash-Lite-Modelle sind schnell und günstig, aber beim Erstellen von Szenen weniger zuverlässig.",
+        "es": "Responde al chat, crea las escenas y redacta el resumen semanal. 3.8 Flash es el mejor del nivel gratuito; 4 Argon es el más capaz pero solo de pago; los Flash-Lite son rápidos y baratos pero menos fiables para crear escenas."
+      },
+      "required": true,
+      "default": "gemini-3.8-flash",
+      "options": [
+        {
+          "value": "gemini-3.8-flash",
+          "label": {
+            "en": "Gemini 3.8 Flash (recommended)",
+            "fr": "Gemini 3.8 Flash (recommandé)",
+            "de": "Gemini 3.8 Flash (empfohlen)",
+            "es": "Gemini 3.8 Flash (recomendado)"
+          }
+        },
+        {
+          "value": "gemini-4-argon",
+          "label": {
+            "en": "Gemini 4 Argon (paid only)",
+            "fr": "Gemini 4 Argon (payant seulement)",
+            "de": "Gemini 4 Argon (nur bezahlt)",
+            "es": "Gemini 4 Argon (solo de pago)"
+          }
+        },
+        {
+          "value": "gemini-3.6-flash",
+          "label": {
+            "en": "Gemini 3.6 Flash",
+            "fr": "Gemini 3.6 Flash",
+            "de": "Gemini 3.6 Flash",
+            "es": "Gemini 3.6 Flash"
+          }
+        },
+        {
+          "value": "gemini-3.5-flash-lite",
+          "label": {
+            "en": "Gemini 3.5 Flash-Lite",
+            "fr": "Gemini 3.5 Flash-Lite",
+            "de": "Gemini 3.5 Flash-Lite",
+            "es": "Gemini 3.5 Flash-Lite"
+          }
+        },
+        {
+          "value": "gemini-3.1-flash-lite",
+          "label": {
+            "en": "Gemini 3.1 Flash-Lite",
+            "fr": "Gemini 3.1 Flash-Lite",
+            "de": "Gemini 3.1 Flash-Lite",
+            "es": "Gemini 3.1 Flash-Lite"
+          }
+        },
+        {
+          "value": "custom",
+          "label": {
+            "en": "Other model (id below)",
+            "fr": "Autre modèle (identifiant ci-dessous)",
+            "de": "Anderes Modell (ID unten)",
+            "es": "Otro modelo (identificador abajo)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "fast_model",
+      "type": "select",
+      "label": {
+        "en": "Router model",
+        "fr": "Modèle du routeur",
+        "de": "Router-Modell",
+        "es": "Modelo del enrutador"
+      },
+      "description": {
+        "en": "Sorts every chat message before the answer, and must reply within 20 seconds: a small, fast model fits best.",
+        "fr": "Trie chaque message du chat avant la réponse, et doit répondre en moins de 20 secondes : un petit modèle rapide convient le mieux.",
+        "de": "Ordnet jede Chat-Nachricht vor der Antwort ein und muss innerhalb von 20 Sekunden antworten: Ein kleines, schnelles Modell passt am besten.",
+        "es": "Clasifica cada mensaje del chat antes de la respuesta y debe contestar en menos de 20 segundos: lo mejor es un modelo pequeño y rápido."
+      },
+      "required": true,
+      "default": "gemini-3.5-flash-lite",
+      "options": [
+        {
+          "value": "gemini-3.5-flash-lite",
+          "label": {
+            "en": "Gemini 3.5 Flash-Lite (recommended)",
+            "fr": "Gemini 3.5 Flash-Lite (recommandé)",
+            "de": "Gemini 3.5 Flash-Lite (empfohlen)",
+            "es": "Gemini 3.5 Flash-Lite (recomendado)"
+          }
+        },
+        {
+          "value": "gemini-3.1-flash-lite",
+          "label": {
+            "en": "Gemini 3.1 Flash-Lite",
+            "fr": "Gemini 3.1 Flash-Lite",
+            "de": "Gemini 3.1 Flash-Lite",
+            "es": "Gemini 3.1 Flash-Lite"
+          }
+        },
+        {
+          "value": "gemini-3.6-flash",
+          "label": {
+            "en": "Gemini 3.6 Flash",
+            "fr": "Gemini 3.6 Flash",
+            "de": "Gemini 3.6 Flash",
+            "es": "Gemini 3.6 Flash"
+          }
+        },
+        {
+          "value": "gemini-3.8-flash",
+          "label": {
+            "en": "Gemini 3.8 Flash",
+            "fr": "Gemini 3.8 Flash",
+            "de": "Gemini 3.8 Flash",
+            "es": "Gemini 3.8 Flash"
+          }
+        },
+        {
+          "value": "custom",
+          "label": {
+            "en": "Other model (id below)",
+            "fr": "Autre modèle (identifiant ci-dessous)",
+            "de": "Anderes Modell (ID unten)",
+            "es": "Otro modelo (identificador abajo)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "custom_model",
+      "type": "string",
+      "label": {
+        "en": "Other model id",
+        "fr": "Identifiant de l’autre modèle",
+        "de": "ID des anderen Modells",
+        "es": "Identificador del otro modelo"
+      },
+      "description": {
+        "en": "Only for “Other model”: the exact API id of a Gemini model (a newer model, a preview…). It must call functions.",
+        "fr": "Seulement pour « Autre modèle » : l’identifiant exact d’un modèle Gemini (un modèle plus récent, une préversion…). Il doit savoir appeler des fonctions.",
+        "de": "Nur für „Anderes Modell“: die genaue API-ID eines Gemini-Modells (ein neueres Modell, eine Vorschau…). Es muss Funktionen aufrufen können.",
+        "es": "Solo para «Otro modelo»: el identificador exacto de un modelo de Gemini (un modelo más reciente, una versión preliminar…). Debe poder llamar a funciones."
+      },
+      "placeholder": {
+        "en": "gemini-3.1-pro-preview",
+        "fr": "gemini-3.1-pro-preview",
+        "de": "gemini-3.1-pro-preview",
+        "es": "gemini-3.1-pro-preview"
+      },
+      "required": false
+    },
+    {
+      "key": "thinking",
+      "type": "select",
+      "label": {
+        "en": "Thinking of the chat model",
+        "fr": "Réflexion du modèle du chat",
+        "de": "Nachdenken des Chat-Modells",
+        "es": "Razonamiento del modelo del chat"
+      },
+      "description": {
+        "en": "More thinking gives better scenes but slower, costlier answers. Gemini cannot stop thinking: minimal is the least, and 3.8 Flash and 4 Argon start at low.",
+        "fr": "Plus de réflexion donne de meilleures scènes mais des réponses plus lentes et plus chères. Gemini ne peut pas arrêter de réfléchir : minimale est le moins, et 3.8 Flash et 4 Argon commencent à faible.",
+        "de": "Mehr Nachdenken ergibt bessere Szenen, aber langsamere und teurere Antworten. Gemini kann das Nachdenken nicht abschalten: Minimal ist das Wenigste, und 3.8 Flash und 4 Argon beginnen bei niedrig.",
+        "es": "Más razonamiento da mejores escenas pero respuestas más lentas y caras. Gemini no puede dejar de razonar: mínimo es lo menos, y 3.8 Flash y 4 Argon empiezan en bajo."
+      },
+      "required": true,
+      "default": "medium",
+      "options": [
+        {
+          "value": "minimal",
+          "label": {
+            "en": "Minimal",
+            "fr": "Minimale",
+            "de": "Minimal",
+            "es": "Mínimo"
+          }
+        },
+        {
+          "value": "low",
+          "label": {
+            "en": "Low",
+            "fr": "Faible",
+            "de": "Niedrig",
+            "es": "Bajo"
+          }
+        },
+        {
+          "value": "medium",
+          "label": {
+            "en": "Medium (recommended)",
+            "fr": "Moyenne (recommandé)",
+            "de": "Mittel (empfohlen)",
+            "es": "Medio (recomendado)"
+          }
+        },
+        {
+          "value": "high",
+          "label": {
+            "en": "High",
+            "fr": "Élevée",
+            "de": "Hoch",
+            "es": "Alto"
+          }
+        }
+      ]
+    },
+    {
+      "key": "max_tokens",
+      "type": "number",
+      "label": {
+        "en": "Maximum answer length (tokens)",
+        "fr": "Longueur maximale d’une réponse (jetons)",
+        "de": "Maximale Antwortlänge (Tokens)",
+        "es": "Longitud máxima de una respuesta (tokens)"
+      },
+      "description": {
+        "en": "The thinking counts in it too. Raise it if the logs say an answer hit max_tokens; Google advises 32768 for 4 Argon.",
+        "fr": "La réflexion compte aussi dedans. Augmentez-la si les journaux indiquent qu’une réponse a atteint max_tokens ; Google conseille 32768 pour 4 Argon.",
+        "de": "Das Nachdenken zählt ebenfalls dazu. Erhöhe den Wert, wenn die Protokolle melden, dass eine Antwort max_tokens erreicht hat; Google empfiehlt 32768 für 4 Argon.",
+        "es": "El razonamiento también cuenta. Auméntela si los registros indican que una respuesta ha alcanzado max_tokens; Google aconseja 32768 para 4 Argon."
+      },
+      "required": false,
+      "default": 16000,
+      "min": 2048,
+      "max": 65536
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "timeout_seconds": 60,
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "description": {
+        "en": "Asks each chosen model for a one-word answer and shows its time. Spends a few tokens.",
+        "fr": "Demande une réponse d’un mot à chaque modèle choisi et affiche son temps. Consomme quelques jetons.",
+        "de": "Bittet jedes gewählte Modell um eine Antwort aus einem Wort und zeigt die Zeit an. Verbraucht ein paar Tokens.",
+        "es": "Pide una respuesta de una palabra a cada modelo elegido y muestra su tiempo. Consume algunos tokens."
+      }
+    }
+  ],
+  "widgets": [
+    {
+      "key": "usage",
+      "icon": "cpu",
+      "label": {
+        "en": "Gemini usage",
+        "fr": "Conso Gemini",
+        "de": "Gemini-Verbrauch",
+        "es": "Consumo Gemini"
+      },
+      "description": {
+        "en": "Requests and tokens of the assistant, per day and month, and the last error.",
+        "fr": "Requêtes et jetons de l’assistant, par jour et par mois, et la dernière erreur.",
+        "de": "Anfragen und Tokens des Assistenten pro Tag und Monat sowie der letzte Fehler.",
+        "es": "Solicitudes y tokens del asistente, por día y mes, y el último error."
+      }
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "error",
+      "label": {
+        "en": "Gemini: the assistant fails",
+        "fr": "Gemini : l’assistant est en erreur",
+        "de": "Gemini: Der Assistent schlägt fehl",
+        "es": "Gemini: el asistente falla"
+      },
+      "description": {
+        "en": "Gemini stopped answering: key refused, billing, rate limit, model unavailable, API unreachable. Once per failure, not for every message.",
+        "fr": "Gemini ne répond plus : clé refusée, facturation, limite de requêtes, modèle indisponible, API injoignable. Une fois par panne, pas à chaque message.",
+        "de": "Gemini antwortet nicht mehr: Schlüssel abgelehnt, Abrechnung, Anfragelimit, Modell nicht verfügbar, API nicht erreichbar. Einmal pro Ausfall, nicht bei jeder Nachricht.",
+        "es": "Gemini ya no responde: clave rechazada, facturación, límite de solicitudes, modelo no disponible, API inaccesible. Una vez por fallo, no en cada mensaje."
+      },
+      "fields": [
+        {
+          "key": "kind",
+          "type": "select",
+          "required": false,
+          "label": {
+            "en": "Only for",
+            "fr": "Seulement pour",
+            "de": "Nur bei",
+            "es": "Solo para"
+          },
+          "description": {
+            "en": "Leave empty for any failure.",
+            "fr": "Laissez vide pour toute panne.",
+            "de": "Leer lassen für jeden Ausfall.",
+            "es": "Déjelo vacío para cualquier fallo."
+          },
+          "options": [
+            {
+              "value": "auth",
+              "label": {
+                "en": "Key refused",
+                "fr": "Clé refusée",
+                "de": "Schlüssel abgelehnt",
+                "es": "Clave rechazada"
+              }
+            },
+            {
+              "value": "billing",
+              "label": {
+                "en": "Billing or free tier",
+                "fr": "Facturation ou offre gratuite",
+                "de": "Abrechnung oder kostenloser Tarif",
+                "es": "Facturación o nivel gratuito"
+              }
+            },
+            {
+              "value": "rate_limit",
+              "label": {
+                "en": "Rate limit",
+                "fr": "Limite de requêtes",
+                "de": "Anfragelimit",
+                "es": "Límite de solicitudes"
+              }
+            },
+            {
+              "value": "model",
+              "label": {
+                "en": "Model unavailable",
+                "fr": "Modèle indisponible",
+                "de": "Modell nicht verfügbar",
+                "es": "Modelo no disponible"
+              }
+            },
+            {
+              "value": "unreachable",
+              "label": {
+                "en": "API unreachable",
+                "fr": "API injoignable",
+                "de": "API nicht erreichbar",
+                "es": "API inaccesible"
+              }
+            },
+            {
+              "value": "timeout",
+              "label": {
+                "en": "Too slow",
+                "fr": "Trop lent",
+                "de": "Zu langsam",
+                "es": "Demasiado lento"
+              }
+            },
+            {
+              "value": "server",
+              "label": {
+                "en": "Gemini error",
+                "fr": "Erreur Gemini",
+                "de": "Gemini-Fehler",
+                "es": "Error de Gemini"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "kind",
+          "type": "string",
+          "label": {
+            "en": "Kind of failure",
+            "fr": "Type de panne",
+            "de": "Art des Ausfalls",
+            "es": "Tipo de fallo"
+          }
+        },
+        {
+          "key": "message",
+          "type": "string",
+          "label": {
+            "en": "Error message",
+            "fr": "Message d’erreur",
+            "de": "Fehlermeldung",
+            "es": "Mensaje de error"
+          }
+        },
+        {
+          "key": "use",
+          "type": "string",
+          "label": {
+            "en": "Request (chat, router, digest)",
+            "fr": "Requête (chat, router, digest)",
+            "de": "Anfrage (chat, router, digest)",
+            "es": "Solicitud (chat, router, digest)"
+          }
+        },
+        {
+          "key": "model",
+          "type": "string",
+          "label": {
+            "en": "Model",
+            "fr": "Modèle",
+            "de": "Modell",
+            "es": "Modelo"
+          }
+        }
+      ]
+    },
+    {
+      "key": "recovered",
+      "label": {
+        "en": "Gemini: the assistant answers again",
+        "fr": "Gemini : l’assistant répond de nouveau",
+        "de": "Gemini: Der Assistent antwortet wieder",
+        "es": "Gemini: el asistente vuelve a responder"
+      },
+      "description": {
+        "en": "The first answer after a failure.",
+        "fr": "La première réponse après une panne.",
+        "de": "Die erste Antwort nach einem Ausfall.",
+        "es": "La primera respuesta tras un fallo."
+      },
+      "variables": [
+        {
+          "key": "down_minutes",
+          "type": "number",
+          "label": {
+            "en": "Minutes of failure",
+            "fr": "Minutes de panne",
+            "de": "Minuten des Ausfalls",
+            "es": "Minutos de fallo"
+          }
+        }
+      ]
+    }
+  ]
+}

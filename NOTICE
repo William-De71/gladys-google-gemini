@@ -1,0 +1,12 @@
+Gladys Google Gemini integration
+Copyright 2026 William-De71
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It sends the AI requests of a Gladys Assistant instance (chat messages, the
+history, tool definitions and results, chat images) to the Gemini API of
+Google (https://generativelanguage.googleapis.com), with the API key of the
+administrator, and returns the answers to Gladys.
+
+Google, Gemini and Google AI Studio are trademarks of Google LLC. This project
+is not affiliated with, endorsed or sponsored by Google.

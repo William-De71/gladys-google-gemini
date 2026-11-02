@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#57606a"/></marker></defs>
+  <rect width="900" height="300" fill="#ffffff"/>
+  <g font-family="DejaVu Sans, Arial, sans-serif" text-anchor="middle">
+    <rect x="20" y="70" width="220" height="150" rx="14" fill="#e8f1fb" stroke="#2f6fb5" stroke-width="2"/>
+    <text x="130" y="110" font-size="20" font-weight="bold" fill="#1f2328">Gladys Assistant</text>
+    <text x="130" y="140" font-size="14" fill="#57606a">chat, router,</text>
+    <text x="130" y="160" font-size="14" fill="#57606a">scene ai.ask,</text>
+    <text x="130" y="180" font-size="14" fill="#57606a">weekly digest</text>
+    <rect x="340" y="70" width="220" height="150" rx="14" fill="#eef8f0" stroke="#1a7f37" stroke-width="2"/>
+    <text x="450" y="105" font-size="16" font-weight="bold" fill="#1f2328">gladys-google-gemini</text>
+    <text x="450" y="135" font-size="14" fill="#57606a">Docker container</text>
+    <text x="450" y="155" font-size="14" fill="#57606a">OpenAI request →</text>
+    <text x="450" y="175" font-size="14" fill="#57606a">Gemini request,</text>
+    <text x="450" y="195" font-size="14" fill="#57606a">usage in /data</text>
+    <rect x="660" y="70" width="220" height="150" rx="14" fill="#eaf1fe" stroke="#1a73e8" stroke-width="2"/>
+    <text x="770" y="105" font-size="17" font-weight="bold" fill="#1f2328">Gemini API</text>
+    <text x="770" y="135" font-size="14" fill="#57606a">generativelanguage.</text>
+    <text x="770" y="150" font-size="14" fill="#57606a">googleapis.com</text>
+    <text x="770" y="180" font-size="12" fill="#57606a">models/{id}:generateContent</text>
+    <text x="770" y="198" font-size="12" fill="#57606a">models/{id}</text>
+    <path d="M245 125 H335" stroke="#57606a" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+    <text x="290" y="105" font-size="12" fill="#57606a">REST</text>
+    <text x="290" y="150" font-size="12" fill="#57606a">+ WebSocket</text>
+    <text x="290" y="245" font-size="12" fill="#57606a">/api/integration/v1/*</text>
+    <path d="M565 125 H655" stroke="#57606a" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+    <text x="610" y="105" font-size="12" fill="#57606a">HTTPS</text>
+    <text x="610" y="150" font-size="12" fill="#57606a">x-goog-api-key</text>
+    <text x="450" y="275" font-size="13" fill="#57606a">Cloud transport: chat messages, history, tool results and images go to Google (HTTPS). Illustration.</text>
+  </g>
+</svg>

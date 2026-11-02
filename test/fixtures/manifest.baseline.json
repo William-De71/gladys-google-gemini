@@ -1,0 +1,104 @@
+{
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "options": []
+    },
+    {
+      "key": "privacy",
+      "type": "section",
+      "options": []
+    },
+    {
+      "key": "api_key",
+      "type": "secret",
+      "options": []
+    },
+    {
+      "key": "model",
+      "type": "select",
+      "options": [
+        "gemini-3.8-flash",
+        "gemini-4-argon",
+        "gemini-3.6-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "custom"
+      ]
+    },
+    {
+      "key": "fast_model",
+      "type": "select",
+      "options": [
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3.6-flash",
+        "gemini-3.8-flash",
+        "custom"
+      ]
+    },
+    {
+      "key": "custom_model",
+      "type": "string",
+      "options": []
+    },
+    {
+      "key": "thinking",
+      "type": "select",
+      "options": ["minimal", "low", "medium", "high"]
+    },
+    {
+      "key": "max_tokens",
+      "type": "number",
+      "options": []
+    }
+  ],
+  "actions": ["test_connection"],
+  "widgets": [
+    {
+      "key": "usage",
+      "settings": []
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "error",
+      "fields": [
+        {
+          "key": "kind",
+          "options": ["auth", "billing", "rate_limit", "model", "unreachable", "timeout", "server"]
+        }
+      ],
+      "variables": [
+        {
+          "key": "kind",
+          "type": "string"
+        },
+        {
+          "key": "message",
+          "type": "string"
+        },
+        {
+          "key": "use",
+          "type": "string"
+        },
+        {
+          "key": "model",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "key": "recovered",
+      "fields": [],
+      "variables": [
+        {
+          "key": "down_minutes",
+          "type": "number"
+        }
+      ]
+    }
+  ],
+  "scene_actions": []
+}

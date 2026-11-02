@@ -1,0 +1,44 @@
+{
+  "name": "gladys-google-gemini",
+  "version": "0.1.0",
+  "private": true,
+  "description": "External Gladys Assistant integration that runs the Gladys AI assistant on Google Gemini (Gemini API) with your own API key: chat, router, weekly digest, usage widget, failure triggers.",
+  "homepage": "https://github.com/William-De71/gladys-google-gemini",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/William-De71/gladys-google-gemini.git"
+  },
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@gladysassistant/integration-sdk": "^0.16.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "gladys-assistant",
+    "gladys-assistant-integration",
+    "gemini",
+    "google-gemini",
+    "llm",
+    "ai",
+    "assistant",
+    "home-automation"
+  ]
+}

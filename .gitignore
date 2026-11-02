@@ -1,0 +1,17 @@
+node_modules/
+npm-debug.log*
+.env
+.env.*
+# Anchored: `data/` alone would also ignore src/data/.
+/data/
+coverage/
+*.log
+.DS_Store
+
+# Forum post drafts: pasted by hand on the forum, never committed.
+.github/forum-*.md
+
+# Generated screenshots work folder (docs/illustrations/render.sh).
+docs/illustrations/out/
+# Created by the validator of the Gladys core when run from here.
+*.duckdb

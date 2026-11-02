@@ -1,0 +1,16 @@
+name: Feature request
+description: Something the integration could do for you.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What you would like to do
+      description: The use case first (a scene, a dashboard, a notification…), then the idea.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Gladys and integration versions
+      placeholder: 'Gladys 5.2.1, integration 0.1.0'

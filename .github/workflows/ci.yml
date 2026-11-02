@@ -1,0 +1,124 @@
+# -----------------------------------------------------------------------------
+# Continuous integration: every pull request, and the quality gate of the
+# Release workflow (workflow_call) on every push to main. No `push` trigger of
+# its own on main: release.yml runs it there, so a release is never cut from a
+# commit whose checks failed.
+#
+#   1. Prettier, ESLint and the tests, on Node 22 (the oldest version
+#      `engines` accepts) and Node 24 (the one the image ships with);
+#   2. the store admission checks, without the image check (the image of a
+#      version only exists once it is released);
+#   3. the Docker image, built for amd64 and never pushed, then started like
+#      Gladys runs it: a broken Dockerfile or a module that does not load
+#      shows up here rather than in a release.
+# -----------------------------------------------------------------------------
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+# Checks only read the code: no write scope for the token.
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    name: Lint & test (Node ${{ matrix.node-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          # Never the runner's cached Node: it can predate a security release.
+          check-latest: true
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting (Prettier)
+        run: npm run format:check
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+  store:
+    runs-on: ubuntu-latest
+    name: Store admission checks
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          # Never the runner's cached Node: it can predate a security release.
+          check-latest: true
+
+      - name: Validate the manifest, the cover and the docs
+        run: npx --yes github:GladysAssistant/integration-store . --skip-image-check
+
+  docker:
+    runs-on: ubuntu-latest
+    name: Docker build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # Same build as build.yml, without pushing, and for amd64 only: emulating
+      # arm64 is slow, and only the release build needs it.
+      - name: Build (no push)
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: gladys-google-gemini:ci
+
+      # The image as Gladys runs it (read-only, unprivileged, 256 MB, no
+      # network): every module loads, a core request converts to a Gemini
+      # one (tool result named after its call, the call signed with the skip
+      # value), an answer with a thought part converts back to plain text.
+      - name: Smoke test of the image
+        run: |
+          set -euo pipefail
+          docker run --rm --read-only --memory 256m --network none --user node \
+            --tmpfs /data:uid=1000,gid=1000 --entrypoint node gladys-google-gemini:ci \
+            --input-type=module -e "
+              const { createApp } = await import('/app/src/app.js');
+              const { toGeminiContents, toOpenAiCompletion, SKIP_SIGNATURE } = await import('/app/src/convert.js');
+              const { contents } = toGeminiContents([
+                { role: 'user', content: 'Hi' },
+                { role: 'assistant', content: null, tool_calls: [{ id: 'c1', type: 'function', function: { name: 'x', arguments: '{}' } }] },
+                { role: 'tool', tool_call_id: 'c1', content: 'ok' },
+              ]);
+              const completion = toOpenAiCompletion({ candidates: [{ content: { parts: [{ text: '...', thought: true }, { text: 'OK' }] }, finishReason: 'STOP' }] });
+              if (typeof createApp !== 'function' || contents[1].parts[0].thoughtSignature !== SKIP_SIGNATURE || contents[2].parts[0].functionResponse.name !== 'x' || completion.choices[0].message.content !== 'OK') {
+                process.exit(1);
+              }
+              console.log('modules load, a request and an answer convert');
+            "

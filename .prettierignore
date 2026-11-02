@@ -1,0 +1,8 @@
+node_modules/
+package-lock.json
+/data/
+*.log
+docs/illustrations/out/
+
+# Forum post drafts: pasted by hand on the forum, never committed.
+.github/forum-*.md

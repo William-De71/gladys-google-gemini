@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="170" viewBox="0 0 980 170">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#57606a"/></marker></defs>
+  <rect width="980" height="170" fill="#ffffff"/>
+  <g font-family="DejaVu Sans, Arial, sans-serif" text-anchor="middle" font-size="12">
+    <rect x="10" y="50" width="96" height="70" rx="10" fill="#e8f1fb" stroke="#2f6fb5" stroke-width="1.5"/>
+    <text x="58" y="90" font-weight="bold" fill="#1f2328">Merge</text>
+    <path d="M107 85 H117" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="118" y="50" width="96" height="70" rx="10" fill="#e8f1fb" stroke="#2f6fb5" stroke-width="1.5"/>
+    <text x="166" y="80" font-weight="bold" fill="#1f2328">CI</text>
+    <text x="166" y="100" font-size="10" fill="#57606a">lint, tests</text>
+    <path d="M215 85 H225" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="226" y="50" width="96" height="70" rx="10" fill="#e8f1fb" stroke="#2f6fb5" stroke-width="1.5"/>
+    <text x="274" y="80" font-weight="bold" fill="#1f2328">Version</text>
+    <text x="274" y="100" font-size="10" fill="#57606a">from commits</text>
+    <path d="M323 85 H333" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="334" y="50" width="96" height="70" rx="10" fill="#e8f1fb" stroke="#2f6fb5" stroke-width="1.5"/>
+    <text x="382" y="80" font-weight="bold" fill="#1f2328">Changelog</text>
+    <text x="382" y="100" font-size="10" fill="#57606a">generated</text>
+    <path d="M431 85 H441" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="442" y="50" width="96" height="70" rx="10" fill="#e8f1fb" stroke="#2f6fb5" stroke-width="1.5"/>
+    <text x="490" y="90" font-weight="bold" fill="#1f2328">Tag vX.Y.Z</text>
+    <path d="M539 85 H549" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="550" y="50" width="96" height="70" rx="10" fill="#e8f1fb" stroke="#2f6fb5" stroke-width="1.5"/>
+    <text x="598" y="80" font-weight="bold" fill="#1f2328">Image</text>
+    <text x="598" y="100" font-size="10" fill="#57606a">amd64 + arm64</text>
+    <path d="M647 85 H657" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="658" y="50" width="96" height="70" rx="10" fill="#e8f1fb" stroke="#2f6fb5" stroke-width="1.5"/>
+    <text x="706" y="80" font-weight="bold" fill="#1f2328">main</text>
+    <text x="706" y="100" font-size="10" fill="#57606a">to the release</text>
+    <path d="M755 85 H765" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="766" y="50" width="96" height="70" rx="10" fill="#e8f1fb" stroke="#2f6fb5" stroke-width="1.5"/>
+    <text x="814" y="80" font-weight="bold" fill="#1f2328">GitHub</text>
+    <text x="814" y="100" font-size="10" fill="#57606a">Release</text>
+    <path d="M863 85 H873" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="874" y="50" width="96" height="70" rx="10" fill="#e8f1fb" stroke="#2f6fb5" stroke-width="1.5"/>
+    <text x="922" y="80" font-weight="bold" fill="#1f2328">Verify</text>
+    <text x="922" y="100" font-size="10" fill="#57606a">image, store</text>
+    <text x="490" y="150" font-size="12" fill="#57606a">No feat / fix / perf commit: no release. main only announces a version once its image exists. Illustration.</text>
+  </g>
+</svg>

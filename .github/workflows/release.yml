@@ -1,0 +1,242 @@
+# -----------------------------------------------------------------------------
+# Automatic release: every push on main publishes a version when its commits
+# deserve one, without any action from the maintainer.
+#
+#   push on main ──> CI (ci.yml) ──> next version from the Conventional Commits
+#     ──> CHANGELOG.md section ──> commit "chore(release): X.Y.Z" + tag vX.Y.Z
+#     (the tag only) ──> image :X.Y.Z + :latest (build.yml) ──> main moved to
+#     the release commit ──> GitHub Release (github-release.yml)
+#     ──> verification (anonymous pull, amd64 + arm64, store validator, topic)
+#
+# Publication order: main only receives the bumped manifest once its image
+# exists. The store indexes the manifest of main: a version announced before
+# its image would leave the integration out of the catalog, or offer an update
+# Gladys cannot pull.
+#
+# Versions: feat -> minor, fix/perf -> patch, breaking -> major (a minor below
+# 1.0.0). docs/chore/ci/test/style/refactor/build alone release nothing. The
+# base is the last `v*` tag; with no tag yet, the current version (0.1.0) is
+# released as is, its hand-written CHANGELOG section dated.
+#
+# Manual run (Actions -> Release -> Run workflow):
+#   - release-as: force a version, e.g. 2.0.0 (the maintainer's decision);
+#   - dry-run: show the version and the changelog section in the job summary,
+#     publish nothing.
+#
+# Why build.yml and github-release.yml are called instead of triggered by the
+# tag: a tag pushed with the default GITHUB_TOKEN triggers no other workflow.
+# For the same reason, the release commit does not start this workflow again
+# (and the `if` below skips it if it ever did).
+#
+# Protected main branch: moving main to the release commit is refused unless
+# GitHub Actions may bypass the rule (see the README, "Release process").
+# -----------------------------------------------------------------------------
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      release-as:
+        description: 'Force this version (e.g. 2.0.0); empty = computed from the commits'
+        required: false
+        default: ''
+        type: string
+      dry-run:
+        description: 'Compute and show the version and the changelog, publish nothing'
+        required: false
+        default: false
+        type: boolean
+
+# One release at a time, never cancelled half-way (a tag without its image or
+# an image without main would be worse than a queued release).
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  ci:
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  prepare:
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push the release tag
+    outputs:
+      release: ${{ steps.next.outputs.release }}
+      version: ${{ steps.next.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # every commit and tag, for the version and the changelog
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          # Never the runner's cached Node: it can predate a security release.
+          check-latest: true
+
+      - name: Compute the next version
+        id: next
+        env:
+          RELEASE_AS: ${{ inputs.release-as }}
+        run: |
+          set -euo pipefail
+          next="$(node .github/scripts/release.mjs next "${RELEASE_AS:-}")"
+          echo "Next: $next"
+          release="$(jq -r .release <<<"$next")"
+          version="$(jq -r .version <<<"$next")"
+          if [ "$release" = "true" ] && git rev-parse -q --verify "refs/tags/v${version}" >/dev/null; then
+            echo "::error::Tag v${version} already exists but main does not contain it: a previous release stopped half-way. If its image exists, merge the tag into main (git merge v${version}) and push; otherwise re-run the failed jobs of that release."
+            exit 1
+          fi
+          echo "release=$release" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "$release" != "true" ]; then
+            echo "No releasable commit since the last tag (docs, chore, ci, test, style, refactor or build only)." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Update the version files and the changelog
+        if: steps.next.outputs.release == 'true'
+        env:
+          VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${GITHUB_REPOSITORY,,}:${VERSION}"
+          node .github/scripts/release.mjs prepare "$VERSION" "$image"
+          node .github/scripts/release.mjs changelog "$VERSION" "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+          prettier_version="$(node -p "require('./package.json').devDependencies.prettier.replace(/^[^0-9]*/, '')")"
+          npx --yes "prettier@${prettier_version}" --check CHANGELOG.md package.json gladys-assistant-integration.json
+          {
+            echo "## Release ${VERSION}"
+            echo ""
+            node .github/scripts/release.mjs notes "$VERSION" < CHANGELOG.md
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Dry run, nothing published
+        if: steps.next.outputs.release == 'true' && inputs.dry-run
+        run: |
+          echo "> Dry run: no commit, no tag, no image, no GitHub Release." >> "$GITHUB_STEP_SUMMARY"
+          git diff --stat
+
+      # Only the tag is pushed here (it carries the release commit with it):
+      # main moves in the `publish` job, once the image exists.
+      - name: Commit and push the tag
+        if: steps.next.outputs.release == 'true' && !inputs.dry-run
+        env:
+          VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json gladys-assistant-integration.json CHANGELOG.md
+          git commit -m "chore(release): ${VERSION}"
+          git tag -a "v${VERSION}" -m "Release ${VERSION}"
+          git push origin "refs/tags/v${VERSION}"
+
+  build:
+    needs: prepare
+    if: needs.prepare.outputs.release == 'true' && !inputs.dry-run
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+      packages: write
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+
+  # The image exists: main may now announce the version. A fast-forward only,
+  # never a force push: if main moved during the build, the job fails and says
+  # how to finish by hand.
+  publish:
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # move main to the release commit
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Move main to the release commit
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          git fetch origin "refs/tags/v${VERSION}:refs/tags/v${VERSION}"
+          if ! git push origin "refs/tags/v${VERSION}^{commit}:refs/heads/${GITHUB_REF_NAME}"; then
+            echo "::error::${GITHUB_REF_NAME} moved during the release, or is protected. The image of ${VERSION} is published: merge the tag into ${GITHUB_REF_NAME} (git merge v${VERSION}) and push, then run the GitHub releases workflow."
+            exit 1
+          fi
+
+  github-release:
+    needs: publish
+    uses: ./.github/workflows/github-release.yml
+    permissions:
+      contents: write
+
+  verify:
+    needs: [prepare, github-release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout the release
+        uses: actions/checkout@v7
+        with:
+          ref: v${{ needs.prepare.outputs.version }}
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          # Never the runner's cached Node: it can predate a security release.
+          check-latest: true
+
+      - name: The image is public and multi-architecture
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          repo="${GITHUB_REPOSITORY,,}"
+          # An anonymous pull token, exactly what a Gladys instance gets.
+          token="$(curl -fsS "https://ghcr.io/token?scope=repository:${repo}:pull" | jq -r '.token // empty')" || true
+          index="$(curl -fsS -H "Authorization: Bearer ${token}" \
+            -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json' \
+            "https://ghcr.io/v2/${repo}/manifests/${VERSION}")" || {
+            echo "::error::ghcr.io/${repo}:${VERSION} cannot be pulled without authentication. Make the package public: Package settings -> Change visibility -> Public."
+            exit 1
+          }
+          platforms="$(jq -r '[.manifests[]?.platform | select(.os != "unknown") | "\(.os)/\(.architecture)"] | join(" ")' <<<"$index")"
+          echo "Platforms: $platforms"
+          for platform in linux/amd64 linux/arm64; do
+            if ! grep -qw "$platform" <<<"$platforms"; then
+              echo "::error::The image has no ${platform} variant (found: ${platforms})."
+              exit 1
+            fi
+          done
+          echo "Image ghcr.io/${repo}:${VERSION} is public: ${platforms}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Store admission checks (image included)
+        run: npx --yes github:GladysAssistant/integration-store .
+
+      - name: Store topic
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          topics="$(gh api "repos/${GITHUB_REPOSITORY}/topics" --jq '.names[]' || true)"
+          if ! grep -qx 'gladys-assistant-integration' <<<"$topics"; then
+            echo "::warning::Add the 'gladys-assistant-integration' topic to the repository (About -> Topics): the store only indexes tagged repositories, and GITHUB_TOKEN cannot set it."
+          fi
